@@ -1,15 +1,17 @@
 import numpy as np
 import scipy as sp
+import pandas as pd
+import random as rd
 
 def importCities(filename):
-    file = open(filename, "r")
 
-    cities = file.read()
+    citiesloc = np.genfromtxt(filename, dtype = int, skip_header=6, delimiter = ' ', skip_footer = 1)
 
-    print(cities)
+    initial_guess = citiesloc[:,0]
 
-    return cities
+    #print(citiesloc)
 
+<<<<<<< Updated upstream
 def cool1(T):
     alpha =0.99
     return alpha*T
@@ -45,10 +47,19 @@ def swap1(cities):
         
     cities[index1],cities[index2] = cities[index2],cities[index1]
 
+=======
+    print(initial_guess)
+>>>>>>> Stashed changes
 
-importCities("TSP-Configurations/eil51.tsp.txt")
+    return citiesloc, initial_guess
+
+cities_pos = importCities("TSP-Configurations/eil51.tsp.txt")
+
+#initial_vect =
 
 def markov_chain():
+
+
 
     return "thing"
 
