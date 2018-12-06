@@ -5,10 +5,22 @@ import matplotlib.pyplot as plt
 # import scipy as sp
 # import pandas as pd
 
-def importOptimumPath(filename):
+def importOptimumPath(filename, coordinates):
     #imports the optimum path information
     path = np.genfromtxt(filename, dtype = int, skip_header=5, delimiter = ' ', skip_footer = 1)
-    return path
+    pathAll = []
+    
+    print(path)
+    for i in range(len(path)):
+        for j in range(len(coordinates)):
+            
+            if path[i] == coordinates[j][0]:
+                pathAll.append(coordinates[j])
+                break
+            
+    pathAll = np.array(pathAll)
+    print(pathAll)
+    return pathAll
 
 def importCities(filename):
     #imports the data and sets up the basic data types needed
@@ -67,7 +79,7 @@ def simulated_anneling(path,Tstart):
     i = 0
     pathcost = costCalc(path)
     print(pathcost)
-    while T>14:
+    while T>17:
         newpath = swap1(path)
         newcost = costCalc(newpath)
         if accept(newcost, pathcost, T):
@@ -96,11 +108,13 @@ def plotRoute(cities):
 def main():
 
     cities_pos, init_path = importCities("TSP-Configurations/eil51.tsp.txt")
-    optpath = importOptimumPath("TSP-Configurations/eil51.opt.tour.txt")
+    optpath = importOptimumPath("TSP-Configurations/eil51.opt.tour.txt",init_path)
 
     plotRoute(init_path)
-    #optcost = costCalc(optpath)
-
+    optcost = costCalc(optpath)
+    print(optcost)
+    plotRoute(optpath)
+    
     annealedcost, annealedpath = simulated_anneling(init_path, 1000)
 
     #print(optcost)
@@ -109,7 +123,7 @@ def main():
     
     plotRoute(init_path)
     plotRoute(annealedpath)
-
+    plotRoute(optpath)
 
 if __name__ == "__main__":
     main()
