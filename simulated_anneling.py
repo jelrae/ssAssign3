@@ -23,18 +23,22 @@ def importOptimumPath(filename, coordinates):
 def importCities(filename):
     #imports the data and sets up the basic data types needed
     citiesloc = np.genfromtxt(filename, dtype = int, skip_header=6, delimiter = ' ', skip_footer = 1)
-    
-    initial_guess = np.array(citiesloc[:,0])
 
     #shuffles the initial vector
     np.random.shuffle(citiesloc)
 
-    return np.delete(citiesloc, 0, 1), citiesloc
+    return citiesloc
+
+#Coolling schemes: https://www.fys.ku.dk/~andresen/BAhome/ownpapers/permanents/annealSched.pdf
 
 def cool1(T):
     #cools the temperature
     alpha =0.99
     return alpha*T
+
+def linear_cooling(Tmax, steps):
+    #returns the value for a constant cooling over a
+    return Tmax/steps
 
 def accept(cost1,cost2,T):
     #checks if new path is accepted
@@ -74,6 +78,7 @@ def swap1(cities):
 
     return cities
 
+<<<<<<< Updated upstream
 def intersection(cities):
     
     # Creates a list of all intersection in route
@@ -126,6 +131,33 @@ def simulated_annealing(path,Tstart,costs):
         if i%20 == 0:
             T = cool1(T)
             print(T)
+=======
+def twoOptswap(cities):
+
+    index1 = random.randint(0,len(cities)-1)
+    index2 = random.randint(0,len(cities)-1)
+
+    if index1<index2:
+        rangeindex = cities[index1:index2]
+        rangeindex = rangeindex[::-1]
+        cities[index1:index2] = rangeindex
+
+    else:
+        rangeindex = cities[index2:index1]
+        rangeindex = rangeindex[::-1]
+        cities[index2:index1] = rangeindex
+
+    return cities
+
+def simulated_anneling(path,Tstart):
+    #Initial simulated anneling fuction
+    T = Tstart
+    i = 0
+    pathcost = costCalc(path)
+    print(pathcost)
+    while T>17:
+        newpath = twoOptswap(path)
+        newcost = costCalc(newpath)
         if accept(newcost, pathcost, T):
             
             path = newpath
@@ -155,7 +187,7 @@ def plotCosts(costs):
 
 def main():
 
-    cities_pos, init_path = importCities("TSP-Configurations/eil51.tsp.txt")
+    init_path = importCities("TSP-Configurations/eil51.tsp.txt")
     optpath = importOptimumPath("TSP-Configurations/eil51.opt.tour.txt",init_path)
 
     plotRoute(init_path)
@@ -174,6 +206,15 @@ def main():
     plotRoute(init_path)
     plotRoute(annealedpath)
     plotCosts(costs)
+
+def testfunct():
+    a = np.arange(0,100,1)
+
+    print(a)
+
+    b = twoOptswap(a)
+
+    print(b)
 
 if __name__ == "__main__":
     main()
