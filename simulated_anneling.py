@@ -117,20 +117,6 @@ def swap2(cities):
     return cities
         
 
-def simulated_annealing(path,Tstart,costs):
-    #Initial simulated anneling fuction
-    T = Tstart
-    i = 0
-    pathcost,costs = costCalc(path,costs)
-    #print(pathcost)
-    for i in range(1):#while T>0.0001:
-        newpath = swap1(path)
-        newcost,costs = costCalc(newpath,costs)
-        i+=1
-        if i%20 == 0:
-            T = cool1(T)
-            print(T)
-
 def twoOptswap(cities):
 
     index1 = random.randint(0,len(cities)-1)
@@ -148,20 +134,22 @@ def twoOptswap(cities):
 
     return cities
 
-def simulated_anneling(path,Tstart):
+def simulated_annealing(path,Tstart,costs):
     #Initial simulated anneling fuction
     T = Tstart
     i = 0
-    pathcost = costCalc(path)
+    pathcost,costs = costCalc(path,costs)
     print(pathcost)
-    while T>17:
+    while T>0.01:
         newpath = twoOptswap(path)
-        newcost = costCalc(newpath)
+        newcost,costs = costCalc(newpath,costs)
+        i+=1
+        if i%20 == 0:
+            T = cool1(T)
         if accept(newcost, pathcost, T):
             
             path = newpath
             pathcost = newcost
-                #print(T)
 
     return pathcost, path, costs
 
