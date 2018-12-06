@@ -78,7 +78,6 @@ def swap1(cities):
 
     return cities
 
-<<<<<<< Updated upstream
 def intersection(cities):
     
     # Creates a list of all intersection in route
@@ -131,7 +130,7 @@ def simulated_annealing(path,Tstart,costs):
         if i%20 == 0:
             T = cool1(T)
             print(T)
-=======
+
 def twoOptswap(cities):
 
     index1 = random.randint(0,len(cities)-1)
