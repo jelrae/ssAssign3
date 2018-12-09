@@ -1,6 +1,8 @@
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import swapping
+import plotfuncts
 #not used yet so commented out
 # import scipy as sp
 # import pandas as pd
