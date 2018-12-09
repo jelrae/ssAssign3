@@ -23,9 +23,10 @@ def importOptimumPath(filename, coordinates):
 def importCities(filename):
     #imports the data and sets up the basic data types needed
     citiesloc = np.genfromtxt(filename, dtype = int, skip_header=6, delimiter = ' ', skip_footer = 1)
-
+    print(citiesloc)
     #shuffles the initial vector
     np.random.shuffle(citiesloc)
+    print(citiesloc)
 
     return citiesloc
 
@@ -33,7 +34,7 @@ def importCities(filename):
 
 def cool1(T):
     #cools the temperature
-    alpha =0.99
+    alpha =0.9
     return alpha*T
 
 def linear_cooling(Tmax, steps):
@@ -139,8 +140,7 @@ def simulated_annealing(path,Tstart,costs):
     T = Tstart
     i = 0
     pathcost,costs = costCalc(path,costs)
-    print(pathcost)
-    while T>0.01:
+    while T>0.001:
         newpath = twoOptswap(path)
         newcost,costs = costCalc(newpath,costs)
         i+=1
@@ -170,7 +170,7 @@ def plotCosts(costs):
     
     plt.figure()
     plt.plot(costs[1],costs[0])
-    plt.figure()
+    plt.show()
 
 def main():
 
@@ -182,17 +182,20 @@ def main():
     optcost, optlist = costCalc(optpath,optlist)
     print(optcost)
     plotRoute(optpath)
-    
+    tmp = [[], []]
+    initial_cost, tmp = costCalc(init_path, tmp)
     costs = [[],[]]
-    
-    annealedcost, annealedpath, costs = simulated_annealing(init_path, 1,costs)
+    print("The initial cost is: ", initial_cost)
+    for t in np.arange(.1, 101, 5):
 
-    #print(optcost)
-    print(annealedcost)
-    print(annealedpath)
-    plotRoute(init_path)
-    plotRoute(annealedpath)
-    plotCosts(costs)
+        annealedcost, annealedpath, costs = simulated_annealing(init_path, t,costs)
+
+        #print(optcost)
+        print("The annealed cost for start temp: ", t, "is ", annealedcost)
+        #print(annealedpath)
+        #plotRoute(init_path)
+        #plotRoute(annealedpath)
+        #plotCosts(costs)
 
 def testfunct():
     a = np.arange(0,100,1)
