@@ -4,72 +4,58 @@ import swapping
 import plotfuncts
 import coolfunc
 import importfunc
+import copy
 #not used yet so commented out
 
 def accept(cost1,cost2,T):
     #checks if new path is accepted
+    
     if cost1<cost2:
         return True
-    
+    #return False
     chance = np.exp((cost2-cost1)/T)
-    #print(chance)
+    if T > 1000:
+        print(chance)
     if random.random()<chance:
         #print("accepted")
         return True
     
     return False
 
-def costCalc(cities,costs):
+def costCalc(cities):
     # initial cost calc function
     cost=0
+    #print(cities)
     
     for i in range(len(cities)-1):
 
         cost+= ((cities[i][1]-cities[i+1][1])**2 + (cities[i][2]-cities[i+1][2])**2)**0.5
     
-    costs[0].append(cost)
-    costs[1].append(len(costs[0]))
-    return cost,costs
-
-def intersection(cities):
-    
-    # Creates a list of all intersection in route
-    
-    number = len(cities)
-    intersections = []
-    
-    for i in range(number):
-        
-        i2 = (i+1)%number
-        i3 = (i+2)%number
-        i4 = (i+3)%number
-        
-        diff1 = [abs(cities[i][1]-cities[i2][1]),abs(cities[i][2]-cities[i2][2])]
-        diff2 = [abs(cities[i3][1]-cities[i4][1]),abs(cities[i3][2]-cities[i4][2])]
-        #print(diff1[0]*diff2[1] - diff2[0]*diff1[1])
-        if diff1[0]*diff2[1] - diff2[0]*diff1[1] != 0:
-            #print(diff1[0]*diff2[1] - diff2[0]*diff1[1])
-            intersections.append(i)
-            
-    return intersections
+    return cost
 
 def simulated_annealing(path,Tstart,costs):
     #Initial simulated anneling fuction
     T = Tstart
     i = 0
-    pathcost,costs = costCalc(path,costs)
-    while T>0.001:
-        newpath = swapping.twoOptswap(path)
-        newcost,costs = costCalc(newpath,costs)
+    pathcost = costCalc(path)
+    costs[0].append(pathcost)
+    costs[1].append(len(costs[0]))
+    
+    while T>0.01:
+        newpath = swapping.twoOptswap(copy.copy(path))
+        newcost = costCalc(newpath)
+        
         i+=1
         if i%20 == 0:
             T = coolfunc.cool1(T)
         if accept(newcost, pathcost, T):
-            
             path = newpath
             pathcost = newcost
-
-    return pathcost, path, costs
+            
+        costs[0].append(pathcost)
+        costs[1].append(len(costs[0]))
+    
+    return pathcost, path
 
 def main():
 
@@ -77,24 +63,24 @@ def main():
     optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt",init_path)
 
     plotfuncts.plotRoute(init_path)
-    optlist = [[],[]]
-    optcost, optlist = costCalc(optpath,optlist)
+    optcost = costCalc(optpath)
     print(optcost)
     plotfuncts.plotRoute(optpath)
-    tmp = [[], []]
-    initial_cost, tmp = costCalc(init_path, tmp)
+    
+    initial_cost = costCalc(init_path)
     costs = [[],[]]
     print("The initial cost is: ", initial_cost)
-    for t in np.arange(.1, 101, 5):
+    for t in np.arange(100,10,-30):
 
-        annealedcost, annealedpath, costs = simulated_annealing(init_path, t,costs)
+        annealedcost, annealedpath = simulated_annealing(init_path, t,costs)
 
         #print(optcost)
         print("The annealed cost for start temp: ", t, "is ", annealedcost)
         #print(annealedpath)
         #plotfuncts.plotRoute(init_path)
         #plotfuncts.plotRoute(annealedpath)
-        #plotfuncts.plotCosts(costs)
+        plotfuncts.plotCosts(costs)
+        init_path = annealedpath
 
 def testfunct():
     a = np.arange(0,100,1)
