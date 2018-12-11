@@ -7,26 +7,32 @@ Created on Tue Dec 11 14:05:24 2018
 
 import csv
 
-def saveData(markov, thePath, costs, costdiff):
+def saveCost(markov, costs):
     
-    saveMain(markov, thePath, costs)
-    saveCostDiff(markov,costdiff)
-    
-def saveMain(markov, thePath, costs):
-    
-    filename = "coolingfunctionmaybeheating.csv"
+    filename = "costcoolingfunctionmaybeheating" + str(markov) + ".csv"
     
     with open(filename, 'a', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"')
         
-            writer.writerow([markov,thePath,costs])
+            writer.writerow(costs)
+    
+def savePath(markov, thePath, theCost, avCost, variance):
+    
+    pathOnly = [thePath[i][0] for i in range(len(thePath))]
+    
+    filename = "pathcoolingfunctionmaybeheating" + str(markov) + ".csv"
+    
+    with open(filename, 'a', newline = '') as csvfile:
+            writer = csv.writer(csvfile, delimiter=',', quotechar='"')
+        
+            writer.writerow([theCost, avCost, variance,pathOnly])
 
     
 def saveCostDiff(markov, costdiff):
     
-    filename = "coolingfunctionandmaybeheating.csv"
+    filename = "diffcoolingfunctionmaybeheating" + str(markov) + ".csv"
     
     with open(filename, 'a', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"')
             
-            writer.writerow([markov,costdiff])
+            writer.writerow(costdiff)
