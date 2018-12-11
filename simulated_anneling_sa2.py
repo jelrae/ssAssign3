@@ -146,12 +146,12 @@ def appendData(data, best_cost,best_path,average,variance,tolerance, itters):
 def main():
     markovlen = 20
     data = []
-    #init_path = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
-    init_path = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
+    init_path = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
+    #init_path = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
 
     
-    #optpath = importfunc.importOptimumPath("TSP-Configurations/a280.opt.tour.txt",init_path)
-    optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt", init_path)
+    optpath = importfunc.importOptimumPath("TSP-Configurations/a280.opt.tour.txt",init_path)
+    #optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt", init_path)
 
 
     #plotfuncts.plotRoute(init_path)
@@ -164,7 +164,7 @@ def main():
     costdiff = []
     print("The initial cost is: ", initial_cost)
 
-    experimentannealing(20, 22, 1, init_path, costs, costdiff, data)
+    experimentannealing(50, 501, 50, init_path, costs, costdiff, data)
 
     #x, s = confidence_interval_func(init_path, costs, markovlen,costdiff,data)
 
