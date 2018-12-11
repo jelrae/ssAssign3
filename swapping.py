@@ -13,7 +13,6 @@ def swap1(cities):
 
     return cities
 
-
 def swap2(cities):
     number = len(cities)
 

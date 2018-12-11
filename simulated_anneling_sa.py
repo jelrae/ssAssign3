@@ -6,6 +6,7 @@ import coolfunc
 import importfunc
 import copy
 import save
+import confidenceiv
 #not used yet so commented out
 
 def accept(cost1,cost2,T,costdiff):
@@ -76,7 +77,32 @@ def simulated_annealing(path,Tstart,costs,mlen,costdiff):
 def varychainlength(minlen, maxlen, stepsz, init_path, Tstart, costs):
 
     for markov in np.arange(minlen, maxlen, stepsz):
+        confidenceiv
         annealedcost, annealedpath = simulated_annealing(init_path, Tstart, costs, markov)
+
+def confidence_interval_func():
+
+    costarray = []
+
+    init_path = importfunc.importCities("TSP-Configurations/pcb442.tsp.txt")
+    for i in range(0,101):
+        current_path = np.copy(init_path)
+        np.random.shuffle(current_path)
+        annealedcost, annealedpath = simulated_annealing(current_path, t, costs, costdiff)
+        costarray.append(annealedcost)
+        if
+    average = np.mean(costarray)
+    variance = np.var(costarray)
+
+    while confidenceiv.checkstop(variance, len(costarray), 0.1):
+        current_path = np.copy(init_path)
+        np.random.shuffle(current_path)
+        annealedcost, annealedpath = simulated_annealing(current_path, t, costs, costdiff)
+        costarray.append(annealedcost)
+        calcurmv(average, variance, annealedcost, len(costarray))
+
+    return average, variance
+
 
 def main():
     markovlen = 20
