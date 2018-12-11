@@ -7,4 +7,10 @@ def cool1(T):
 
 def linear_cooling(Tmax, steps):
     #returns the value for a constant cooling over a
-    return Tmax/steps
+    alpha = .1*Tmax
+    return Tmax - (alpha*steps)
+
+def log_cooling(steos, c):
+
+    d = 1
+    return c/(math.log10(steps+d))

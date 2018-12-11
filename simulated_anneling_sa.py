@@ -33,7 +33,20 @@ def costCalc(cities):
     
     return cost
 
-def simulated_annealing(path,Tstart,costs):
+def reheating_annealing(init_path, costs, mlen):
+    for t in np.arange(100,10,-30):
+
+        annealedcost, annealedpath = simulated_annealing(init_path, t,costs, mlen)
+
+        #print(optcost)
+        print("The annealed cost for start temp: ", t, "is ", annealedcost)
+        #print(annealedpath)
+        #plotfuncts.plotRoute(init_path)
+        #plotfuncts.plotRoute(annealedpath)
+        plotfuncts.plotCosts(costs)
+        init_path = annealedpath
+
+def simulated_annealing(path,Tstart,costs,mlen):
     #Initial simulated anneling fuction
     T = Tstart
     i = 0
@@ -46,7 +59,7 @@ def simulated_annealing(path,Tstart,costs):
         newcost = costCalc(newpath)
         
         i+=1
-        if i%20 == 0:
+        if i%mlen == 0:
             T = coolfunc.cool1(T)
         if accept(newcost, pathcost, T):
             path = newpath
@@ -57,8 +70,13 @@ def simulated_annealing(path,Tstart,costs):
     
     return pathcost, path
 
-def main():
+def varychainlength(minlen, maxlen, stepsz, init_path, Tstart, costs):
 
+    for markov in np.arange(minlen, maxlen, stepsz):
+        annealedcost, annealedpath = simulated_annealing(init_path, Tstart, costs, markov)
+
+def main():
+    markovlen = 20
     init_path = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
     optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt",init_path)
 
@@ -70,17 +88,8 @@ def main():
     initial_cost = costCalc(init_path)
     costs = [[],[]]
     print("The initial cost is: ", initial_cost)
-    for t in np.arange(100,10,-30):
 
-        annealedcost, annealedpath = simulated_annealing(init_path, t,costs)
-
-        #print(optcost)
-        print("The annealed cost for start temp: ", t, "is ", annealedcost)
-        #print(annealedpath)
-        #plotfuncts.plotRoute(init_path)
-        #plotfuncts.plotRoute(annealedpath)
-        plotfuncts.plotCosts(costs)
-        init_path = annealedpath
+    reheating_annealing(init_path, costs, markovlen)
 
 def testfunct():
     a = np.arange(0,100,1)
