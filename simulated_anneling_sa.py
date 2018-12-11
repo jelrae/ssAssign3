@@ -35,7 +35,21 @@ def costCalc(cities):
     
     return cost
 
-def simulated_annealing(path,Tstart,costs,costdiff):
+def reheating_annealing(init_path, costs, mlen):
+    for t in np.arange(100,10,-30):
+
+        annealedcost, annealedpath = simulated_annealing(init_path, t,costs, mlen)
+
+        #print(optcost)
+        print("The annealed cost for start temp: ", t, "is ", annealedcost)
+        #print(annealedpath)
+        #plotfuncts.plotRoute(init_path)
+        #plotfuncts.plotRoute(annealedpath)
+        plotfuncts.plotCosts(costs)
+        init_path = annealedpath
+
+def simulated_annealing(path,Tstart,costs,mlen,costdiff):
+
     #Initial simulated anneling fuction
     T = Tstart
     i = 0
@@ -48,7 +62,7 @@ def simulated_annealing(path,Tstart,costs,costdiff):
         newcost = costCalc(newpath)
         
         i+=1
-        if i%20 == 0:
+        if i%mlen == 0:
             T = coolfunc.cool1(T)
         if accept(newcost, pathcost, T, costdiff):
             path = newpath
@@ -59,8 +73,13 @@ def simulated_annealing(path,Tstart,costs,costdiff):
     
     return pathcost, path
 
-def main():
+def varychainlength(minlen, maxlen, stepsz, init_path, Tstart, costs):
 
+    for markov in np.arange(minlen, maxlen, stepsz):
+        annealedcost, annealedpath = simulated_annealing(init_path, Tstart, costs, markov)
+
+def main():
+    markovlen = 20
     init_path = importfunc.importCities("TSP-Configurations/pcb442.tsp.txt")
     
     optpath = importfunc.importOptimumPath("TSP-Configurations/pcb442.opt.tour.txt",init_path)
@@ -74,6 +93,7 @@ def main():
     costs = [[],[]]
     costdiff = []
     print("The initial cost is: ", initial_cost)
+    
     for t in np.arange(100,90,-30):
 
         annealedcost, annealedpath = simulated_annealing(init_path, t,costs,costdiff)
@@ -86,6 +106,8 @@ def main():
         plotfuncts.plotCosts(costs)
         init_path = annealedpath
         
+    reheating_annealing(init_path, costs, markovlen)
+    
     save.saveData(20,annealedpath,costs,costdiff)
 
 def testfunct():
