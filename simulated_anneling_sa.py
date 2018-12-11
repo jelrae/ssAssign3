@@ -40,7 +40,6 @@ def reheating_annealing(init_path, costs, mlen,costdiff):
     for t in np.arange(100,10,-30):
 
         annealedcost, annealedpath = simulated_annealing(init_path, t,costs, mlen,costdiff)
-
         #print(optcost)
         print("The annealed cost for start temp: ", t, "is ", annealedcost)
         #print(annealedpath)
@@ -52,98 +51,110 @@ def reheating_annealing(init_path, costs, mlen,costdiff):
 def simulated_annealing(path,Tstart,costs,mlen,costdiff):
 
     #Initial simulated anneling fuction
+    best_path = np.copy(path)
+    best_cost = 0
     T = Tstart
     i = 0
     pathcost = costCalc(path)
     costs[0].append(pathcost)
     costs[1].append(len(costs[0]))
     
-    while T>0.01:
+    while T>0.001:
         newpath = swapping.twoOptswap(copy.copy(path))
         newcost = costCalc(newpath)
         
         i+=1
         if i%mlen == 0:
             T = coolfunc.cool1(T)
+        if newcost<pathcost:
+            best_cost = newcost
+            best_path = np.copy(newpath)
         if accept(newcost, pathcost, T, costdiff):
             path = newpath
             pathcost = newcost
-            
+
         costs[0].append(pathcost)
         costs[1].append(len(costs[0]))
     
-    return pathcost, path
+    return pathcost, path, best_cost, best_path
 
-def varychainlength(minlen, maxlen, stepsz, init_path, Tstart, costs):
+def experimentannealing(minlen, maxlen, stepsz, init_path, costs, costdiff,data):
 
+    Tstart = 20
     for markov in np.arange(minlen, maxlen, stepsz):
-        confidenceiv
-        annealedcost, annealedpath = simulated_annealing(init_path, Tstart, costs, markov)
+        data.append(['exponential', markov])
+        annealedcost, annealedpath = confidence_interval_func(init_path,costs,markov,costdiff,data)
+    print(annealedcost, annealedpath)
 
-def confidence_interval_func():
-
+def confidence_interval_func(init_path, costs, markov, costdiff, data):
+    best_path = []
+    best_cost = 0
     costarray = []
-
-    init_path = importfunc.importCities("TSP-Configurations/pcb442.tsp.txt")
-    for i in range(0,101):
+    t = 20
+    current_path = np.copy(init_path)
+    annealedcost, annealedpath, best_cost, best_path = simulated_annealing(current_path, t, costs, markov, costdiff)
+    for i in range(0,100):
+        print(len(costarray))
         current_path = np.copy(init_path)
         np.random.shuffle(current_path)
-        annealedcost, annealedpath = simulated_annealing(current_path, t, costs, costdiff)
-        costarray.append(annealedcost)
-        if
-    average = np.mean(costarray)
-    variance = np.var(costarray)
 
-    while confidenceiv.checkstop(variance, len(costarray), 0.1):
+        if i<10:
+            save.saveCost(['exponential',markov,costs])
+            save.saveCostDiff(['exponential',markov,costdiff])
+
+        annealedcost, annealedpath, tmpcost, tmppath = simulated_annealing(current_path, t, costs, markov, costdiff)
+        if tmpcost<best_cost:
+            best_path = tmppath
+            best_cost = tmpcost
+        costarray.append(annealedcost)
+
+    npcosts = np.array(costarray)
+    #print(npcosts)
+    average = np.mean(npcosts)
+    variance = np.sqrt(np.var(npcosts))
+    #print("this is the variance", variance)
+
+    while confidenceiv.checkstop(variance, len(costarray), average*0.01, average):
+
+        print(len(costarray))
         current_path = np.copy(init_path)
         np.random.shuffle(current_path)
-        annealedcost, annealedpath = simulated_annealing(current_path, t, costs, costdiff)
+        annealedcost, annealedpath, tmpcost, tmppath = simulated_annealing(current_path, t, costs, markov, costdiff)
+        if tmpcost<best_cost:
+            best_path = tmppath
+            best_cost = tmpcost
         costarray.append(annealedcost)
-        calcurmv(average, variance, annealedcost, len(costarray))
+        average, variance = confidenceiv.calcurmv(average, variance, annealedcost, len(costarray))
+    tolerance = (2 * 2.975 * variance / (len(costarray)) ** 0.5)
 
+    pathOnly = [best_path[i][0] for i in range(len(annealedpath))]
+    data[len(data)-1].append(best_cost,pathOnly,average,variance,tolerance, len(costarray))
     return average, variance
 
 
 def main():
     markovlen = 20
-    init_path = importfunc.importCities("TSP-Configurations/pcb442.tsp.txt")
+    data = []
+    init_path = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
     
-    optpath = importfunc.importOptimumPath("TSP-Configurations/pcb442.opt.tour.txt",init_path)
+    optpath = importfunc.importOptimumPath("TSP-Configurations/a280.opt.tour.txt",init_path)
 
-    plotfuncts.plotRoute(init_path)
+    #plotfuncts.plotRoute(init_path)
     optcost = costCalc(optpath)
     print(optcost)
-    plotfuncts.plotRoute(optpath)
+    #plotfuncts.plotRoute(optpath)
     
     initial_cost = costCalc(init_path)
     costs = [[],[]]
     costdiff = []
     print("The initial cost is: ", initial_cost)
-    
-    for t in np.arange(100,90,-30):
 
-        annealedcost, annealedpath = simulated_annealing(init_path, t,costs,markovlen,costdiff)
+    experimentannealing(20, 21, 1, init_path, costs, costdiff,data)
 
-        #print(optcost)
-        print("The annealed cost for start temp: ", t, "is ", annealedcost)
-        #print(annealedpath)
-        #plotfuncts.plotRoute(init_path)
-        plotfuncts.plotRoute(annealedpath)
-        plotfuncts.plotCosts(costs)
-        init_path = annealedpath
-        
-    reheating_annealing(init_path, costs, markovlen,costdiff)
-    
-    save.saveData(20,annealedpath,costs,costdiff)
+    #x, s = confidence_interval_func(init_path, costs, markovlen,costdiff,data)
 
-def testfunct():
-    a = np.arange(0,100,1)
-
-    print(a)
-
-    b = twoOptswap(a)
-
-    print(b)
+    print(x, s)
+    save.savePath(data)
 
 if __name__ == "__main__":
     main()
