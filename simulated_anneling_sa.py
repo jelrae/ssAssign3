@@ -36,10 +36,10 @@ def costCalc(cities):
     
     return cost
 
-def reheating_annealing(init_path, costs, mlen):
+def reheating_annealing(init_path, costs, mlen,costdiff):
     for t in np.arange(100,10,-30):
 
-        annealedcost, annealedpath = simulated_annealing(init_path, t,costs, mlen)
+        annealedcost, annealedpath = simulated_annealing(init_path, t,costs, mlen,costdiff)
 
         #print(optcost)
         print("The annealed cost for start temp: ", t, "is ", annealedcost)
@@ -122,7 +122,7 @@ def main():
     
     for t in np.arange(100,90,-30):
 
-        annealedcost, annealedpath = simulated_annealing(init_path, t,costs,costdiff)
+        annealedcost, annealedpath = simulated_annealing(init_path, t,costs,markovlen,costdiff)
 
         #print(optcost)
         print("The annealed cost for start temp: ", t, "is ", annealedcost)
@@ -132,7 +132,7 @@ def main():
         plotfuncts.plotCosts(costs)
         init_path = annealedpath
         
-    reheating_annealing(init_path, costs, markovlen)
+    reheating_annealing(init_path, costs, markovlen,costdiff)
     
     save.saveData(20,annealedpath,costs,costdiff)
 
