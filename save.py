@@ -9,7 +9,7 @@ import csv
 
 def saveCost(costs):
     
-    filename = "costcoolingfunctionmaybeheating.csv"
+    filename = "costoveritersexpcooling.csv"
     
     with open(filename, 'a', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"')
@@ -19,7 +19,7 @@ def saveCost(costs):
 def savePath(data):
 
     
-    filename = "pathcoolingfunctionmaybeheating.csv"
+    filename = "pathoveritersexpcooling.csv"
     
     with open(filename, 'a', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"')
@@ -31,7 +31,7 @@ def savePath(data):
     
 def saveCostDiff(costdiff):
     
-    filename = "diffcoolingfunctionmaybeheating.csv"
+    filename = "differenceexpcooling.csv"
     
     with open(filename, 'a', newline = '') as csvfile:
             writer = csv.writer(csvfile, delimiter=',', quotechar='"')

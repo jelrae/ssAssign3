@@ -112,7 +112,7 @@ def confidence_interval_func(init_path, costs, markov, costdiff, data):
     #print(npcosts)
     average = np.mean(npcosts)
     variance = np.sqrt(np.var(npcosts))
-    #print("this is the variance", variance)
+    print("this is the average", average)
 
     while confidenceiv.checkstop(variance, len(costarray), average*0.01, average):
 
@@ -128,16 +128,30 @@ def confidence_interval_func(init_path, costs, markov, costdiff, data):
     tolerance = (2 * 2.975 * variance / (len(costarray)) ** 0.5)
 
     pathOnly = [best_path[i][0] for i in range(len(annealedpath))]
-    data[len(data)-1].append(best_cost,pathOnly,average,variance,tolerance, len(costarray))
+    #data[len(data)-1].append(best_cost,pathOnly,average,variance,tolerance, len(costarray))
+    data = appendData(data, best_cost,pathOnly,average,variance,tolerance, len(costarray))
     return average, variance
+
+def appendData(data, best_cost,best_path,average,variance,tolerance, itters):
+    data[len(data)-1].append(best_cost)
+    data[len(data) - 1].append(best_path)
+    data[len(data) - 1].append(average)
+    data[len(data) - 1].append(variance)
+    data[len(data) - 1].append(tolerance)
+    data[len(data) - 1].append(itters)
+    return data
 
 
 def main():
     markovlen = 20
     data = []
     init_path = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
+    #init_path = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
+
     
     optpath = importfunc.importOptimumPath("TSP-Configurations/a280.opt.tour.txt",init_path)
+    optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt", init_path)
+
 
     #plotfuncts.plotRoute(init_path)
     optcost = costCalc(optpath)
@@ -149,11 +163,10 @@ def main():
     costdiff = []
     print("The initial cost is: ", initial_cost)
 
-    experimentannealing(20, 21, 1, init_path, costs, costdiff,data)
+    experimentannealing(50, 501, 50, init_path, costs, costdiff, data)
 
     #x, s = confidence_interval_func(init_path, costs, markovlen,costdiff,data)
 
-    print(x, s)
     save.savePath(data)
 
 if __name__ == "__main__":
