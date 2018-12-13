@@ -5,7 +5,7 @@ import plotfuncts
 import coolfunc
 import importfunc
 import copy
-import save
+import savecostfinding
 import confidenceiv
 #not used yet so commented out
 
@@ -17,8 +17,8 @@ def accept(cost1,cost2,T,costdiff):
     #return False
     chance = np.exp((cost2-cost1)/T)
     costdiff.append(cost1-cost2)
-    if T > 1000:
-        print(chance)
+    # if T > 1000:
+    #     print(chance)
     if random.random()<chance:
         #print("accepted")
         return True
@@ -59,7 +59,7 @@ def simulated_annealing(path,Tstart,costs,mlen,costdiff):
     costs[0].append(pathcost)
     costs[1].append(len(costs[0]))
     
-    while T>0.01:
+    while i<10000:
         newpath = swapping.twoOptswap(copy.copy(path))
         newcost = costCalc(newpath)
         
@@ -78,6 +78,48 @@ def simulated_annealing(path,Tstart,costs,mlen,costdiff):
     
     return pathcost, path, best_cost, best_path
 
+def markovCostcheck(path):
+    data = [[],[]]
+
+    # for t in np.arange(0.1, 1, .1):
+    #     print(t)
+    #     costdiff = []
+    #     accepted = 0
+    #     curpath = np.copy(path)
+    #     np.random.shuffle(curpath)
+    #     curcost = costCalc(curpath)
+    #     for i in range(0, 100000):
+    #         newpath = swapping.twoOptswap(np.copy(curpath))
+    #         newcost = costCalc(newpath)
+    #
+    #         if accept(newcost, curcost, t, costdiff):
+    #             curpath = newpath
+    #             curcost = newcost
+    #             accepted += 1
+    #     data[0].append(t)
+    #     data[1].append(accepted/100000)
+    #     print(accepted/100000)
+    for t in np.arange(600, 1500, 25):
+        curpath = np.copy(path)
+        curcost = costCalc(curpath)
+        print(t)
+        costdiff = []
+        accepted = 0
+        for i in range(0, 10000):
+            newpath = swapping.twoOptswap(np.copy(curpath))
+            newcost = costCalc(newpath)
+
+            if accept(newcost, curcost, t, costdiff):
+                curpath = newpath
+                curcost = newcost
+                accepted += 1
+        data[0].append(t)
+        data[1].append(accepted/10000)
+        print(accepted / 10000)
+
+    return data
+
+
 def experimentannealing(minlen, maxlen, stepsz, init_path, costs, costdiff,data):
 
     for markov in np.arange(minlen, maxlen, stepsz):
@@ -90,7 +132,7 @@ def confidence_interval_func(init_path, costs, markov, costdiff, data):
     best_path = []
     best_cost = 0
     costarray = []
-    t = 87.5
+    t = 10
     current_path = np.copy(init_path)
     annealedcost, annealedpath, best_cost, best_path = simulated_annealing(current_path, t, costs, markov, costdiff)
     for i in range(0,100):
@@ -117,7 +159,7 @@ def confidence_interval_func(init_path, costs, markov, costdiff, data):
     variance = np.sqrt(np.var(npcosts))
     print("this is the average", average)
 
-    while confidenceiv.checkstop(variance, len(costarray), average*0.02, average):
+    while confidenceiv.checkstop(variance, len(costarray), average*0.01, average):
 
         print(len(costarray))
         current_path = np.copy(init_path)
@@ -148,30 +190,19 @@ def appendData(data, best_cost,best_path,average,variance,tolerance, itters):
 
 
 def main():
+    markovlen = 20
     data = []
-    init_path = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
-    #init_path = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
+    init_path442 = importfunc.importCities("TSP-Configurations/pcb442.tsp.txt")
+    init_path280 = importfunc.importCities("TSP-Configurations/a280.tsp.txt")
+    init_path51 = importfunc.importCities("TSP-Configurations/eil51.tsp.txt")
 
-    
-    optpath = importfunc.importOptimumPath("TSP-Configurations/a280.opt.tour.txt",init_path)
-    #optpath = importfunc.importOptimumPath("TSP-Configurations/eil51.opt.tour.txt", init_path)
-
-
-    #plotfuncts.plotRoute(init_path)
-    optcost = costCalc(optpath)
-    print(optcost)
-    #plotfuncts.plotRoute(optpath)
-    
-    initial_cost = costCalc(init_path)
-    costs = [[],[]]
-    costdiff = []
+    path = init_path442
+    initial_cost = costCalc(path)
     print("The initial cost is: ", initial_cost)
 
-    experimentannealing(50, 501, 50, init_path, costs, costdiff, data)
+    data = markovCostcheck(path)
 
-    #x, s = confidence_interval_func(init_path, costs, markovlen,costdiff,data)
-
-    save.savePath(data)
+    savecostfinding.savePath(data)
 
 if __name__ == "__main__":
     main()
